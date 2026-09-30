@@ -1,0 +1,25 @@
+## .NET
+bin/
+obj/
+publish/
+*.user
+*.userosscache
+*.suo
+
+## Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.DotSettings.user
+
+## Test results
+TestResults/
+*.trx
+
+## OS
+.DS_Store
+Thumbs.db
+
+## App logs (this repo's logs/ dir is a run-log output location, not source)
+logs/*
+!logs/.gitkeep

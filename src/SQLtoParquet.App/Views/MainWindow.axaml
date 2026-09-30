@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SQLtoParquet.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="760"
+        x:Class="SQLtoParquet.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="SQLtoParquet"
+        Width="1200" Height="760">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Padding="12" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto" x:DataType="vm:ConnectionViewModel" DataContext="{Binding Connection}">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                    <Button Content="Connect…" Click="ConnectButton_Click"/>
+                    <TextBlock Text="{Binding ConnectionSummary}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="About" Click="AboutButton_Click"/>
+            </Grid>
+        </Border>
+
+        <TabControl Grid.Row="1" Margin="12">
+
+            <!-- Export tab -->
+            <TabItem Header="Export">
+                <Grid RowDefinitions="Auto,Auto,*" x:DataType="vm:TableListViewModel" DataContext="{Binding TableList}">
+
+                    <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,8">
+                        <CheckBox Grid.Column="0" Content="Select all" IsChecked="{Binding IsAllSelected}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="Output folder:" VerticalAlignment="Center" Margin="16,0,6,0"/>
+                        <TextBox Grid.Column="2" Text="{Binding OutputFolder}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="3" Content="Browse…" Click="BrowseOutputFolder_Click" Margin="6,0,0,0"/>
+                        <TextBlock Grid.Column="4" Text="Parallel:" VerticalAlignment="Center" Margin="16,0,6,0"/>
+                        <NumericUpDown Grid.Column="5" Value="{Binding MaxParallelism}" Minimum="1" Maximum="16" Width="90" ShowButtonSpinner="True"/>
+                        <TextBlock Grid.Column="6" Text="Rows/group:" VerticalAlignment="Center" Margin="16,0,6,0"/>
+                        <NumericUpDown Grid.Column="7" Value="{Binding RowsPerRowGroup}" Minimum="1000" Maximum="10000000" Increment="10000" Width="130" ShowButtonSpinner="True"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                        <ProgressBar Grid.Column="0" Value="{Binding OverallProgressPercent}" Minimum="0" Maximum="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <Button Grid.Column="1" Content="Start Export" Command="{Binding StartExportCommand}"/>
+                        <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelExportCommand}" Margin="6,0,0,0"/>
+                    </Grid>
+
+                    <DataGrid Grid.Row="2" ItemsSource="{Binding Tables}" AutoGenerateColumns="False"
+                              GridLinesVisibility="Horizontal" IsReadOnly="False">
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected}" Width="36"/>
+                            <DataGridTextColumn Header="Schema" Binding="{Binding Schema}" Width="110" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Table" Binding="{Binding Table}" Width="180" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Rows" Binding="{Binding RowCount}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Data MB" Binding="{Binding DataSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Index MB" Binding="{Binding IndexSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Total MB" Binding="{Binding TotalSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Progress %" Binding="{Binding ProgressPercent, StringFormat='{}{0:N0}'}" Width="90" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Parquet MB" Binding="{Binding ParquetFileSizeMb, StringFormat='{}{0:N2}'}" Width="100" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="220" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" VerticalAlignment="Bottom" Opacity="0.75" Margin="0,4,0,0"
+                               IsVisible="{Binding !HasTables}"/>
+                </Grid>
+            </TabItem>
+
+            <!-- Analyze (DuckDB) tab -->
+            <TabItem Header="Analyze (DuckDB)">
+                <Grid RowDefinitions="Auto,Auto,Auto,*" x:DataType="vm:AnalysisViewModel" DataContext="{Binding Analysis}">
+                    <TextBlock Grid.Row="0" Text="Query the exported Parquet files with DuckDB SQL (e.g. read_parquet('folder/*.parquet')):" Margin="0,0,0,6" Opacity="0.8"/>
+                    <TextBox Grid.Row="1" Text="{Binding SqlText}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" FontFamily="Consolas,Cascadia Mono,monospace"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,8,0,8">
+                        <Button Grid.Column="0" Content="Run Query" Command="{Binding RunQueryCommand}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                    </Grid>
+                    <DataGrid Grid.Row="3" ItemsSource="{Binding Results.DefaultView}" AutoGenerateColumns="True" IsReadOnly="True" GridLinesVisibility="Horizontal"/>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>

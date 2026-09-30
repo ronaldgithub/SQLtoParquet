@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SQLtoParquet.App.ViewModels"
+        xmlns:svc="using:SQLtoParquet.App.Services"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SQLtoParquet.App.Views.ConnectionDialog"
+        x:DataType="vm:ConnectionViewModel"
+        Title="Connect to SQL Server"
+        Width="420" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <Design.DataContext>
+        <vm:ConnectionViewModel/>
+    </Design.DataContext>
+
+    <StackPanel Margin="20" Spacing="6">
+        <TextBlock Text="Server" FontSize="11" FontWeight="Bold" Opacity="0.6"/>
+        <TextBox PlaceholderText="Server (e.g. .\SQLEXPRESS)" Text="{Binding Server}"/>
+
+        <TextBlock Text="Authentication" FontSize="11" FontWeight="Bold" Opacity="0.6" Margin="0,10,0,0"/>
+        <ComboBox ItemsSource="{Binding AuthModes}" SelectedItem="{Binding SelectedAuthMode}" HorizontalAlignment="Stretch"/>
+        <TextBox PlaceholderText="Username" Text="{Binding Username}" IsVisible="{Binding IsSqlAuth}"/>
+        <TextBox PlaceholderText="Password" Text="{Binding Password}" PasswordChar="*" IsVisible="{Binding IsSqlAuth}"/>
+
+        <Button Content="Connect" Command="{Binding ConnectCommand}" HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Center" Margin="0,10,0,0"/>
+        <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap" FontSize="12" Opacity="0.75"/>
+
+        <ComboBox x:Name="DatabaseCombo" ItemsSource="{Binding AvailableDatabases}" SelectedItem="{Binding SelectedDatabase}"
+                  PlaceholderText="Select a database…" HorizontalAlignment="Stretch"
+                  IsVisible="{Binding IsConnectedToServer}" SelectionChanged="DatabaseCombo_SelectionChanged"/>
+
+        <TextBlock Text="Recent" FontSize="11" FontWeight="Bold" Opacity="0.6" Margin="0,10,0,0" IsVisible="{Binding HasRecentConnections}"/>
+        <ItemsControl ItemsSource="{Binding RecentConnections}" IsVisible="{Binding HasRecentConnections}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="svc:ConnectionProfile">
+                    <Button Content="{Binding DisplayName}" Click="RecentConnection_Click" Tag="{Binding}"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Margin="0,2"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Button Content="Cancel" Click="Cancel_Click" HorizontalAlignment="Right" Margin="0,14,0,0"/>
+    </StackPanel>
+</Window>

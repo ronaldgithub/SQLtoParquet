@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="SQLtoParquet.App.Views.AboutDialog"
+        Title="About SQLtoParquet"
+        Width="360" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner">
+
+    <StackPanel Margin="24" Spacing="4">
+        <TextBlock Text="SQLtoParquet" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="VersionText" Text="Version" FontSize="12" Opacity="0.7" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+        <TextBlock Text="Exports SQL Server tables to local Parquet files, with row/index size comparisons and an embedded DuckDB tab for querying the results."
+                   TextWrapping="Wrap" TextAlignment="Center" Opacity="0.85" Margin="0,0,0,16"/>
+
+        <TextBlock Text="ronald.de.groot@opendata.nl" HorizontalAlignment="Center" TextDecorations="Underline"
+                   Cursor="Hand" PointerPressed="Email_PointerPressed"/>
+        <TextBlock Text="www.dbaronald.com" HorizontalAlignment="Center" TextDecorations="Underline"
+                   Cursor="Hand" PointerPressed="DbaronaldCom_PointerPressed" Margin="0,4,0,0"/>
+        <TextBlock Text="dbaronald.nl" HorizontalAlignment="Center" TextDecorations="Underline"
+                   Cursor="Hand" PointerPressed="DbaronaldNl_PointerPressed" Margin="0,4,0,0"/>
+
+        <Button Content="Close" Click="Close_Click" HorizontalAlignment="Center" Margin="0,20,0,0" Width="90"/>
+    </StackPanel>
+</Window>
