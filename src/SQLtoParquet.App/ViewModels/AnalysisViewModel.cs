@@ -90,6 +90,37 @@ public partial class AnalysisViewModel : ViewModelBase
             GROUP BY 1
             ORDER BY badges DESC;
             """),
+        new("9. Diff vs. a previous export (added/removed/changed)", """
+            -- Compares two snapshots of the same table to see what changed between exports.
+            -- Workflow: export Badges, rename dbo_Badges.snappy.parquet to
+            -- dbo_Badges_old.snappy.parquet, make your SQL Server edits, export Badges again
+            -- (the fresh file becomes "new"), then run this.
+            WITH old_data AS (SELECT * FROM read_parquet('{folder}/dbo_Badges_old.snappy.parquet')),
+                 new_data AS (SELECT * FROM read_parquet('{folder}/dbo_Badges.snappy.parquet'))
+            SELECT 'ADDED' AS change_type, n.Id, n.Name, n.Date, n.Class, n.UserId
+            FROM new_data n
+            LEFT JOIN old_data o USING (Id)
+            WHERE o.Id IS NULL
+
+            UNION ALL
+
+            SELECT 'REMOVED' AS change_type, o.Id, o.Name, o.Date, o.Class, o.UserId
+            FROM old_data o
+            LEFT JOIN new_data n USING (Id)
+            WHERE n.Id IS NULL
+
+            UNION ALL
+
+            SELECT 'CHANGED' AS change_type, n.Id, n.Name, n.Date, n.Class, n.UserId
+            FROM new_data n
+            JOIN old_data o USING (Id)
+            WHERE o.Name IS DISTINCT FROM n.Name
+               OR o.Date IS DISTINCT FROM n.Date
+               OR o.Class IS DISTINCT FROM n.Class
+               OR o.UserId IS DISTINCT FROM n.UserId
+
+            ORDER BY change_type, Id;
+            """),
     ];
 
     public AnalysisViewModel() : this(new DuckDbQueryService())
