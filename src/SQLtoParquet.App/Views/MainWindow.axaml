@@ -30,7 +30,7 @@
         <TabControl Grid.Row="1" Margin="12">
 
             <!-- Export tab -->
-            <TabItem Header="Export">
+            <TabItem Header="SQL Export">
                 <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" x:DataType="vm:TableListViewModel" DataContext="{Binding TableList}">
 
                     <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,8">
@@ -117,6 +117,10 @@
                         </ScrollViewer>
                     </Border>
                 </Grid>
+            </TabItem>
+
+            <!-- Analyze (Fabric) tab — placeholder for future Azure Fabric OneLake integration -->
+            <TabItem Header="Analyze (Fabric)">
             </TabItem>
 
         </TabControl>
