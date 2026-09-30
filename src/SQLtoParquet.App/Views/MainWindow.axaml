@@ -52,13 +52,14 @@
                     </Grid>
 
                     <!-- List header -->
-                    <Grid Grid.Row="2" ColumnDefinitions="32,260,90,100,90,140,100" Margin="4,0,4,4" Opacity="0.6">
-                        <TextBlock Grid.Column="1" Text="Table" FontSize="11" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="2" Text="Rows" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,12,0"/>
-                        <TextBlock Grid.Column="3" Text="SQL MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,12,0"/>
-                        <TextBlock Grid.Column="4" Text="Status" FontSize="11" FontWeight="Bold" Margin="8,0,0,0"/>
-                        <TextBlock Grid.Column="5" Text="Progress" FontSize="11" FontWeight="Bold"/>
-                        <TextBlock Grid.Column="6" Text="Parquet MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="32,240,90,85,100,120,85,55" Margin="4,0,4,4" Opacity="0.6">
+                        <TextBlock Grid.Column="1" Text="Table" FontSize="11" FontWeight="Bold" Margin="4,0,16,0"/>
+                        <TextBlock Grid.Column="2" Text="Rows" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="3" Text="SQL MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="4" Text="Status" FontSize="11" FontWeight="Bold" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="5" Text="Progress" FontSize="11" FontWeight="Bold" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="6" Text="Parquet MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="7" Text="Ratio" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
                     </Grid>
 
                     <Border Grid.Row="3" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
@@ -67,14 +68,15 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="vm:TableExportRowViewModel">
                                         <Border BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="0,0,0,1" Padding="4,6">
-                                            <Grid ColumnDefinitions="32,260,90,100,90,140,100" ToolTip.Tip="{Binding ErrorMessage}">
+                                            <Grid ColumnDefinitions="32,240,90,85,100,120,85,55" ToolTip.Tip="{Binding ErrorMessage}">
                                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalAlignment="Center"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding QualifiedName}" VerticalAlignment="Center" ToolTip.Tip="{Binding QualifiedName}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding RowCountDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,12,0"/>
-                                                <TextBlock Grid.Column="3" Text="{Binding TotalSizeMbDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,12,0"/>
-                                                <TextBlock Grid.Column="4" Text="{Binding Status}" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                                                <ProgressBar Grid.Column="5" Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="14" VerticalAlignment="Center" Margin="8,0,8,0"/>
-                                                <TextBlock Grid.Column="6" Text="{Binding ParquetFileSizeMbDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding QualifiedName}" VerticalAlignment="Center" ToolTip.Tip="{Binding QualifiedName}" TextTrimming="CharacterEllipsis" Margin="4,0,16,0"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding RowCountDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding TotalSizeMbDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                                                <TextBlock Grid.Column="4" Text="{Binding Status}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                                <ProgressBar Grid.Column="5" Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="14" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                                                <TextBlock Grid.Column="6" Text="{Binding ParquetFileSizeMbDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,16,0"/>
+                                                <TextBlock Grid.Column="7" Text="{Binding RatioDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>

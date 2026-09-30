@@ -46,9 +46,16 @@ public partial class TableExportRowViewModel(TableSizeInfo info) : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ParquetFileSizeMbDisplay))]
+    [NotifyPropertyChangedFor(nameof(RatioDisplay))]
     private double? parquetFileSizeMb;
 
     public string ParquetFileSizeMbDisplay => ParquetFileSizeMb?.ToString("N2", DisplayCulture) ?? string.Empty;
+
+    /// <summary>How many times smaller the Parquet file is than the original SQL size, e.g. "3,3x".</summary>
+    public string RatioDisplay =>
+        ParquetFileSizeMb is > 0 && TotalSizeMb > 0
+            ? (TotalSizeMb / ParquetFileSizeMb.Value).ToString("N1", DisplayCulture) + "x"
+            : string.Empty;
 
     [ObservableProperty]
     private string? errorMessage;
