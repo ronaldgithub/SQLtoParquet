@@ -91,14 +91,31 @@
 
             <!-- Analyze (DuckDB) tab -->
             <TabItem Header="Analyze (DuckDB)">
-                <Grid RowDefinitions="Auto,Auto,Auto,*" x:DataType="vm:AnalysisViewModel" DataContext="{Binding Analysis}">
-                    <TextBlock Grid.Row="0" Text="Query the exported Parquet files with DuckDB SQL (e.g. read_parquet('folder/*.parquet')):" Margin="0,0,0,6" Opacity="0.8"/>
-                    <TextBox Grid.Row="1" Text="{Binding SqlText}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" FontFamily="Consolas,Cascadia Mono,monospace"/>
-                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,8,0,8">
-                        <Button Grid.Column="0" Content="Run Query" Command="{Binding RunQueryCommand}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="10,0,0,0" Opacity="0.8"/>
+                <Grid RowDefinitions="Auto,Auto,2*,Auto,*" x:DataType="vm:AnalysisViewModel" DataContext="{Binding Analysis}">
+
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                        <TextBlock Grid.Column="0" Text="Query the exported Parquet files with DuckDB SQL:" VerticalAlignment="Center" Opacity="0.8"/>
+                        <Button Grid.Column="1" Content="Examples" Click="ExamplesButton_Click" Margin="0,0,8,0"/>
+                        <Button Grid.Column="2" Content="Run Query" Command="{Binding RunQueryCommand}"/>
                     </Grid>
-                    <DataGrid Grid.Row="3" ItemsSource="{Binding Results.DefaultView}" AutoGenerateColumns="True" IsReadOnly="True" GridLinesVisibility="Horizontal"/>
+
+                    <TextBlock Grid.Row="1" Text="{Binding StatusMessage}" Margin="0,0,0,6" Opacity="0.8"/>
+
+                    <!-- Query pane (resizable via the splitter below) -->
+                    <Border Grid.Row="2" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
+                        <TextBox Text="{Binding SqlText}" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap"
+                                 FontFamily="Consolas,Cascadia Mono,monospace" VerticalContentAlignment="Top"
+                                 BorderThickness="0" Background="Transparent"/>
+                    </Border>
+
+                    <GridSplitter Grid.Row="3" Height="6" HorizontalAlignment="Stretch" Background="{DynamicResource SystemBaseLowColor}" Margin="0,6,0,6"/>
+
+                    <!-- Results pane -->
+                    <Border Grid.Row="4" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding ResultsText}" FontFamily="Consolas,Cascadia Mono,monospace" TextWrapping="NoWrap" Margin="8"/>
+                        </ScrollViewer>
+                    </Border>
                 </Grid>
             </TabItem>
 

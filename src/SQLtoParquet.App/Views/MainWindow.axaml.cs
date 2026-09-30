@@ -49,4 +49,20 @@ public partial class MainWindow : Window
         Directory.CreateDirectory(AppPaths.LogsDir);
         Process.Start(new ProcessStartInfo(AppPaths.LogsDir) { UseShellExecute = true });
     }
+
+    private void ExamplesButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm || sender is not Control anchor)
+            return;
+
+        var flyout = new MenuFlyout();
+        foreach (var example in vm.Analysis.Examples)
+        {
+            var item = new MenuItem { Header = example.Title };
+            item.Click += (_, _) => vm.Analysis.UseExample(example);
+            flyout.Items.Add(item);
+        }
+
+        flyout.ShowAt(anchor);
+    }
 }
