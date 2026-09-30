@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using SQLtoParquet.App.Services;
 using SQLtoParquet.Core.Export;
 using SQLtoParquet.Core.Export.Destinations;
+using SQLtoParquet.Core.Logging;
 using SQLtoParquet.Core.SqlServer;
 
 namespace SQLtoParquet.App.ViewModels;
@@ -41,6 +42,9 @@ public partial class TableListViewModel : ViewModelBase
     [ObservableProperty]
     private string statusMessage = "Connect and pick a database to see tables.";
 
+    [ObservableProperty]
+    private string? lastLogFilePath;
+
     public bool HasTables => Tables.Count > 0;
 
     public TableListViewModel() : this(new SqlServerTableCatalogService(), new ExportOrchestrator(new TableExporter()))
@@ -58,6 +62,7 @@ public partial class TableListViewModel : ViewModelBase
     {
         connectionString = newConnectionString;
         Tables.Clear();
+        OverallProgressPercent = 0;
         StatusMessage = "Loading tables...";
 
         try
@@ -127,6 +132,12 @@ public partial class TableListViewModel : ViewModelBase
         };
         var destination = new LocalFileExportDestination(OutputFolder);
 
+        LastLogFilePath = AppPaths.NewExportLogPath();
+        await using var log = new ExportRunLogWriter(LastLogFilePath);
+        log.WriteLine($"Export started: {selected.Count} table(s), parallel={options.MaxParallelism}, rowsPerGroup={options.RowsPerRowGroup}, output={OutputFolder}");
+        foreach (var row in selected)
+            log.WriteLine($"  queued: {row.QualifiedName} (~{row.RowCount:N0} rows, {row.TotalSizeMb:N1} MB)");
+
         var jobs = selected.Select(row => new TableExportJob(
             row.Schema,
             row.Table,
@@ -135,6 +146,7 @@ public partial class TableListViewModel : ViewModelBase
             {
                 row.ReportProgress(p);
                 RecomputeOverallProgress();
+                log.WriteLine($"{row.QualifiedName}: {p.RowsProcessed:N0} row(s) processed");
             }))).ToList();
 
         try
@@ -150,26 +162,31 @@ public partial class TableListViewModel : ViewModelBase
                     row.RowsProcessed = result.RowsExported;
                     row.ProgressPercent = 100;
                     row.ParquetFileSizeMb = result.OutputFileSizeBytes / 1024.0 / 1024.0;
+                    log.WriteLine($"{row.QualifiedName}: succeeded — {result.RowsExported:N0} rows, {row.ParquetFileSizeMb:N2} MB, {result.Duration:mm\\:ss\\.fff} -> {result.OutputFilePath}");
                 }
                 else
                 {
                     row.Status = ExportRowStatus.Failed;
                     row.ErrorMessage = result.Error;
+                    log.WriteLine($"{row.QualifiedName}: FAILED — {result.Error}");
                 }
             }
 
             int succeeded = results.Count(r => r.Success);
-            StatusMessage = $"Export complete: {succeeded}/{results.Count} table(s) succeeded.";
+            StatusMessage = $"Export complete: {succeeded}/{results.Count} table(s) succeeded. Log: {LastLogFilePath}";
+            log.WriteLine($"Export complete: {succeeded}/{results.Count} table(s) succeeded.");
         }
         catch (OperationCanceledException)
         {
             foreach (var row in selected.Where(t => t.Status == ExportRowStatus.Running))
                 row.Status = ExportRowStatus.Canceled;
             StatusMessage = "Export canceled.";
+            log.WriteLine("Export canceled by user.");
         }
         catch (Exception ex)
         {
             StatusMessage = $"Export failed: {ex.Message}";
+            log.WriteLine($"Export failed: {ex.Message}");
         }
         finally
         {

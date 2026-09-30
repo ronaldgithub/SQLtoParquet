@@ -9,7 +9,8 @@
         x:DataType="vm:ConnectionViewModel"
         Title="Connect to SQL Server"
         Width="420" SizeToContent="Height" CanResize="False"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico">
 
     <Design.DataContext>
         <vm:ConnectionViewModel/>

@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using SQLtoParquet.App.Services;
 using SQLtoParquet.App.ViewModels;
 
 namespace SQLtoParquet.App.Views;
@@ -40,5 +42,11 @@ public partial class MainWindow : Window
 
         if (folders.Count > 0)
             vm.TableList.OutputFolder = folders[0].Path.LocalPath;
+    }
+
+    private void OpenLogFolder_Click(object? sender, RoutedEventArgs e)
+    {
+        Directory.CreateDirectory(AppPaths.LogsDir);
+        Process.Start(new ProcessStartInfo(AppPaths.LogsDir) { UseShellExecute = true });
     }
 }

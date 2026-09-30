@@ -6,9 +6,11 @@
         x:Class="SQLtoParquet.App.Views.AboutDialog"
         Title="About SQLtoParquet"
         Width="360" SizeToContent="Height" CanResize="False"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Icon="/Assets/app.ico">
 
     <StackPanel Margin="24" Spacing="4">
+        <Image Source="/Assets/app.ico" Width="64" Height="64" HorizontalAlignment="Center" Margin="0,0,0,8"/>
         <TextBlock Text="SQLtoParquet" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
         <TextBlock x:Name="VersionText" Text="Version" FontSize="12" Opacity="0.7" HorizontalAlignment="Center" Margin="0,0,0,12"/>
         <TextBlock Text="Exports SQL Server tables to local Parquet files, with row/index size comparisons and an embedded DuckDB tab for querying the results."

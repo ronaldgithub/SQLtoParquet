@@ -6,6 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="760"
         x:Class="SQLtoParquet.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/app.ico"
         Title="SQLtoParquet"
         Width="1200" Height="760">
 
@@ -30,7 +31,7 @@
 
             <!-- Export tab -->
             <TabItem Header="Export">
-                <Grid RowDefinitions="Auto,Auto,*" x:DataType="vm:TableListViewModel" DataContext="{Binding TableList}">
+                <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" x:DataType="vm:TableListViewModel" DataContext="{Binding TableList}">
 
                     <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" Margin="0,0,0,8">
                         <CheckBox Grid.Column="0" Content="Select all" IsChecked="{Binding IsAllSelected}" VerticalAlignment="Center"/>
@@ -38,36 +39,51 @@
                         <TextBox Grid.Column="2" Text="{Binding OutputFolder}" VerticalAlignment="Center"/>
                         <Button Grid.Column="3" Content="Browse…" Click="BrowseOutputFolder_Click" Margin="6,0,0,0"/>
                         <TextBlock Grid.Column="4" Text="Parallel:" VerticalAlignment="Center" Margin="16,0,6,0"/>
-                        <NumericUpDown Grid.Column="5" Value="{Binding MaxParallelism}" Minimum="1" Maximum="16" Width="90" ShowButtonSpinner="True"/>
+                        <NumericUpDown Grid.Column="5" Value="{Binding MaxParallelism}" Minimum="1" Maximum="16" Width="130" FormatString="0" ShowButtonSpinner="True"/>
                         <TextBlock Grid.Column="6" Text="Rows/group:" VerticalAlignment="Center" Margin="16,0,6,0"/>
-                        <NumericUpDown Grid.Column="7" Value="{Binding RowsPerRowGroup}" Minimum="1000" Maximum="10000000" Increment="10000" Width="130" ShowButtonSpinner="True"/>
+                        <NumericUpDown Grid.Column="7" Value="{Binding RowsPerRowGroup}" Minimum="1000" Maximum="10000000" Increment="10000" Width="190" FormatString="0" ShowButtonSpinner="True"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8">
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,0,0,8">
                         <ProgressBar Grid.Column="0" Value="{Binding OverallProgressPercent}" Minimum="0" Maximum="100" VerticalAlignment="Center" Margin="0,0,10,0"/>
                         <Button Grid.Column="1" Content="Start Export" Command="{Binding StartExportCommand}"/>
                         <Button Grid.Column="2" Content="Cancel" Command="{Binding CancelExportCommand}" Margin="6,0,0,0"/>
+                        <Button Grid.Column="3" Content="Open Log Folder" Click="OpenLogFolder_Click" Margin="6,0,0,0"/>
                     </Grid>
 
-                    <DataGrid Grid.Row="2" ItemsSource="{Binding Tables}" AutoGenerateColumns="False"
-                              GridLinesVisibility="Horizontal" IsReadOnly="False">
-                        <DataGrid.Columns>
-                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected}" Width="36"/>
-                            <DataGridTextColumn Header="Schema" Binding="{Binding Schema}" Width="110" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Table" Binding="{Binding Table}" Width="180" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Rows" Binding="{Binding RowCount}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Data MB" Binding="{Binding DataSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Index MB" Binding="{Binding IndexSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Total MB" Binding="{Binding TotalSizeMb, StringFormat='{}{0:N1}'}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Progress %" Binding="{Binding ProgressPercent, StringFormat='{}{0:N0}'}" Width="90" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Parquet MB" Binding="{Binding ParquetFileSizeMb, StringFormat='{}{0:N2}'}" Width="100" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="Error" Binding="{Binding ErrorMessage}" Width="220" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <!-- List header -->
+                    <Grid Grid.Row="2" ColumnDefinitions="32,*,90,90,90,140,90" Margin="4,0,4,4" Opacity="0.6">
+                        <TextBlock Grid.Column="1" Text="Table" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="2" Text="Rows" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Column="3" Text="SQL MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Column="4" Text="Status" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="5" Text="Progress" FontSize="11" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="6" Text="Parquet MB" FontSize="11" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    </Grid>
 
-                    <TextBlock Grid.Row="2" Text="{Binding StatusMessage}" VerticalAlignment="Bottom" Opacity="0.75" Margin="0,4,0,0"
-                               IsVisible="{Binding !HasTables}"/>
+                    <Border Grid.Row="3" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1">
+                        <ScrollViewer>
+                            <ItemsControl ItemsSource="{Binding Tables}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TableExportRowViewModel">
+                                        <Border BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="0,0,0,1" Padding="4,6">
+                                            <Grid ColumnDefinitions="32,*,90,90,90,140,90" ToolTip.Tip="{Binding ErrorMessage}">
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}" VerticalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding QualifiedName}" VerticalAlignment="Center" ToolTip.Tip="{Binding QualifiedName}"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding RowCount}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Column="3" Text="{Binding TotalSizeMb, StringFormat='{}{0:N1}'}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                                <TextBlock Grid.Column="4" Text="{Binding Status}" VerticalAlignment="Center"/>
+                                                <ProgressBar Grid.Column="5" Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Column="6" Text="{Binding ParquetFileSizeMb, StringFormat='{}{0:N2}'}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Border>
+
+                    <TextBlock Grid.Row="4" Text="{Binding StatusMessage}" Opacity="0.75" Margin="0,6,0,0"/>
                 </Grid>
             </TabItem>
 
