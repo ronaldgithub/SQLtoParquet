@@ -5,6 +5,8 @@ namespace SQLtoParquet.Core.SqlServer;
 /// <summary>
 /// Lists user tables in the connection's current database along with row counts and
 /// data/index space usage, using the same sys.allocation_units-based query sp_spaceused relies on.
+/// Excludes sysdiagrams — an SSMS-internal support table created the moment anyone opens the old
+/// Database Diagrams tool, never real user data (same exclusion SQLModelViewer applies).
 /// </summary>
 public sealed class SqlServerTableCatalogService : ITableCatalogService
 {
@@ -22,6 +24,7 @@ public sealed class SqlServerTableCatalogService : ITableCatalogService
         INNER JOIN sys.partitions p ON i.object_id = p.object_id AND i.index_id = p.index_id
         INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
         WHERE t.is_ms_shipped = 0
+            AND t.name <> N'sysdiagrams'
         GROUP BY s.name, t.name
         ORDER BY s.name, t.name
         """;
